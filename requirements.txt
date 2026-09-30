@@ -1,0 +1,9 @@
+fastapi>=0.115,<1
+uvicorn[standard]>=0.34,<1
+pydantic>=2.8,<3
+python-dotenv>=1.0,<2
+requests>=2.32,<3
+earthengine-api>=1.7,<2
+google-genai>=1.0,<2
+matplotlib>=3.9,<4
+numpy>=2.0,<3

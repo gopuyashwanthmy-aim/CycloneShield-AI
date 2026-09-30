@@ -1,0 +1,11 @@
+.env
+.venv
+venv
+__pycache__
+*.pyc
+.cycloneshield_cache
+frontend
+.git
+.gitignore
+README*
+test_*
