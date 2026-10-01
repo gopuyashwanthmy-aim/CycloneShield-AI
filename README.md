@@ -1,99 +1,182 @@
-# CycloneShield AI — Integrated Prototype
+# 🌪️ CycloneShield AI
 
-CycloneShield AI is an AI-assisted pre-landfall cyclone impact and vulnerability assessment platform. It combines Google Earth Engine geospatial indicators, mapped infrastructure exposure, meteorological context, hazard-pathway screening, vulnerability scoring, evacuation planning, infrastructure-hardening checklists, illustrative parametric-liquidity scenarios, early-warning advisory generation, and Gemini reasoning.
+### AI-Powered Pre-Landfall Cyclone Risk, Vulnerability & Anticipatory-Action Intelligence
 
-## Coverage of the challenge
+[![Google Cloud](https://img.shields.io/badge/Google%20Cloud-Cloud%20Run-blue?logo=googlecloud)](https://cloud.google.com/run)
+[![Google Earth Engine](https://img.shields.io/badge/Google-Earth%20Engine-green)](https://earthengine.google.com/)
+[![Gemini](https://img.shields.io/badge/Google-Gemini%20AI-purple)](https://ai.google.dev/)
+[![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-Frontend-61DAFB?logo=react)](https://react.dev/)
 
-- **GEE satellite/geospatial feeds:** SRTM elevation, Dynamic World land cover and Earth Engine rainfall where available.
-- **Meteorological intelligence:** current/forecast context from Open-Meteo plus explicit user-entered cyclone scenarios. The feed is labelled as current/forecast rather than an official warning.
-- **Storm surge:** prototype bathtub-style coastal inundation screening using the existing hazard engine.
-- **Rainfall damage pathways:** relative flow-path screening using the existing HydroSHEDS/SRTM-based engine.
-- **Critical infrastructure:** hospitals, schools, power substations, major roads and mapped shelter-like facilities from OpenStreetMap/Overpass.
-- **Evacuation planning:** prioritization, candidate shelter discovery and route-risk screening.
-- **Infrastructure hardening:** sector checklists for power, healthcare, roads and schools.
-- **Parametric insurance/liquidity:** configurable illustrative trigger/payout scenario; not a real insurance product.
-- **Early warning:** advisory generation and simulated authority dispatch workflow. No message is sent externally.
-- **Gemini multimodal:** Gemini receives structured scenario information and a generated hazard-map image when a Gemini API key is configured.
-- **Resilience:** cached Overpass/weather results, safe missing-data handling and deterministic fallback when Gemini is unavailable.
+> **Prepare before the impact.**
 
-## Important scientific / operational limitations
+CycloneShield AI is an AI-powered **pre-landfall decision-support platform** designed to help communities and disaster-management stakeholders assess cyclone risk, infrastructure exposure, hazard pathways and potential impacts before severe weather reaches affected areas.
 
-This is a decision-support prototype. Storm surge is not a hydrodynamic forecast and does not model tides, waves or detailed bathymetry. Rainfall pathways are screening indicators rather than drainage/runoff forecasts. Infrastructure vulnerability is a transparent potential-impact model, not structural engineering analysis. OSM is a mapped-data source and is not a complete official infrastructure inventory. Parametric insurance outputs are illustrative. Official warnings, evacuation orders and emergency actions must come from authorized agencies.
+The platform combines **Google Earth Engine, Gemini AI, meteorological data, terrain information and OpenStreetMap infrastructure data** to transform a cyclone scenario into a structured workflow:
 
-## Run locally
+**Scenario → Geospatial Intelligence → Hazard Screening → Infrastructure Exposure → Impact Assessment → Anticipatory Action**
 
-### Backend
+---
 
-```cmd
-cd /d "D:\yash\CycloneShield AI"
-python -m pip install -r requirements.txt
-python -m uvicorn backend.main:app --reload
-```
+## 🚀 Live Demo
 
-Keep your existing `.env` in the project root. At minimum:
+🌐 **Live Application**
 
-```env
-GEMINI_API_KEY=your_key_here
-GEMINI_MODEL=gemini-3.7-flash
-CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
-```
+https://cycloneshield-frontend-298560693045.asia-south1.run.app
 
-Earth Engine authentication must already be configured for the Google Cloud project.
+💻 **Source Code**
 
-### Frontend
+https://github.com/gopuyashwanthmy-aim/CycloneShield-AI
 
-```cmd
-cd /d "D:\yash\CycloneShield AI\frontend"
-npm install
-npm run dev
-```
+---
 
-The frontend uses `VITE_API_URL` if provided; otherwise it calls `http://127.0.0.1:8000`.
+## 🎯 Problem
 
-## Full integration smoke test
+Cyclones can cause cascading impacts across:
 
-For a dependency-independent pipeline check, temporarily run the backend with demo mode:
+- 🏥 Healthcare facilities
+- ⚡ Power infrastructure
+- 🛣️ Roads and transportation
+- 🏫 Schools
+- 🏠 Communities and shelters
+- 🌧️ Flood-prone areas
+- 💰 Local economic systems
 
-```cmd
-set DEMO_MODE=1
-python -m uvicorn backend.main:app --reload
-```
+Traditional disaster response often becomes heavily reactive after severe weather impacts an area.
 
-Then run the complete assessment from the UI. Demo mode bypasses external GEE/Overpass calls while exercising the complete orchestration: meteorology → hazards → vulnerability → decision support → evacuation → hardening → liquidity → advisory → Gemini fallback/multimodal layer.
+CycloneShield AI explores how AI and geospatial intelligence can support **pre-landfall preparedness**, helping identify potentially affected infrastructure and translate risk information into anticipatory planning actions.
 
-For the real demonstration, unset `DEMO_MODE` and use the authenticated Google Earth Engine environment.
+---
 
+# 💡 Solution
 
-## Real-data validation
-Run the backend with `DEMO_MODE` unset or set to `0` for Earth Engine, Open-Meteo and OpenStreetMap/Overpass retrieval. Overpass and weather results use the built-in cache when a transient upstream failure occurs. Demo mode is intended only for deterministic pipeline smoke tests.
+CycloneShield AI provides an integrated decision-support workflow that combines:
 
+### 🌍 Geospatial Intelligence
 
+Google Earth Engine is used to retrieve location-specific environmental context such as:
 
-## v2.6.1 infrastructure reliability fix
-Infrastructure retrieval is now split by category (hospitals, schools, power substations, shelters and roads). A timeout or rate-limit in one OpenStreetMap/Overpass category no longer clears the other categories. Each category independently uses live retrieval first and its own stale cache as fallback; major roads retain the OpenStreetMap map-API fallback.
+- Elevation
+- Dynamic World land-cover information
+- Built-area probability
+- Water probability
 
-## v2.2 resilience behavior
-Infrastructure retrieval is split into core assets and major roads. Each group is cached independently. If an Overpass provider times out, a previously cached group may be reused; the API reports `live`, `cache`, or `live+cache` status instead of converting a provider outage into zero infrastructure. If no live or cached data exists, the UI explicitly reports that infrastructure assessment was not performed.
+### 🌦️ Meteorological Intelligence
 
-## v2.3 final-validation behavior
-Storm-surge coastal proximity now uses the same live → cache → unavailable pattern. Successful Overpass coastline geometry is persisted by location. If Overpass returns a 429/5xx or times out, a cached coastline can be reused. If neither is available, Google Earth Engine JRC Global Surface Water is attempted as a mapped surface-water proximity fallback. The API exposes `screening_status` (`live_coastline`, `cached_coastline`, `surface_water_fallback`, or `unavailable`) so zero screened cells are not misrepresented as a confirmed zero-inundation result.
+The platform combines:
 
+- Current meteorological observations
+- Rainfall information
+- Wind information
+- User-defined cyclone scenario parameters
 
-## v2.3 final validation
-The final-validation UI distinguishes a genuine zero-cell storm-surge screening result from an unavailable coastal-data run. Infrastructure totals are explicitly separated from the smaller detailed impact-assessment set and the hazard-affected assessed set. Gemini prompts distinguish user-entered scenario assumptions, retrieved data, modelled screening outputs and contextual AI reasoning; Gemini is instructed not to invent site-specific facilities, waterways, population counts, flood depths, engineering thresholds or official actions.
+### 🏥 Infrastructure Exposure
 
-For a final demo, verify the external data-status labels and run one complete real-data assessment. If an upstream service is unavailable, present the resulting cached/unavailable status rather than interpreting missing data as zero exposure.
+OpenStreetMap data is used to identify mapped infrastructure such as:
 
+- Hospitals
+- Schools
+- Power substations
+- Major roads
+- Medical shelters
 
-## Cloud Run deployment
+### 🌊 Hazard Screening
 
-The repository includes a production deployment layer:
+The platform performs prototype screening for:
 
-- `Dockerfile` — FastAPI backend container.
-- `frontend/Dockerfile` — React/Vite build served by Nginx.
-- `frontend/nginx.conf.template` — same-origin `/api` reverse proxy.
-- `DEPLOYMENT.md` — Google Cloud Run deployment and Earth Engine runtime setup.
+- Storm-surge exposure
+- Rainfall/runoff pathways
+- Terrain-related exposure
+- Infrastructure-hazard intersections
 
-The production frontend does not require a hard-coded backend URL. Nginx receives the backend Cloud Run URL through the `BACKEND_URL` runtime variable.
+### ⚠️ Risk & Impact Assessment
 
-Never commit `.env`, Gemini API keys, Earth Engine private keys, or service-account JSON files.
+A deterministic risk engine combines scenario hazards, spatial exposure and environmental context to generate:
+
+- Overall risk score
+- Asset impact scores
+- Impact levels
+- Hazard intersections
+- Sector-specific planning priorities
+
+### 🚨 Anticipatory Action
+
+The results are translated into:
+
+- Evacuation-planning support
+- Infrastructure-hardening recommendations
+- Early-warning preparedness advisories
+- Monitoring points
+- Illustrative financial-resilience calculations
+
+### 🤖 Gemini AI
+
+Gemini provides an additional contextual reasoning layer over the structured CycloneShield assessment.
+
+The AI layer is designed to help contextualize:
+
+- Scenario conditions
+- Retrieved data
+- Infrastructure exposure
+- Risk indicators
+- Recommended preparedness actions
+
+---
+
+# 🧠 System Architecture
+
+```text
+                   Cyclone Scenario
+                         │
+                         ▼
+              ┌──────────────────────┐
+              │ Meteorological Data  │
+              │ Wind / Rainfall      │
+              └──────────┬───────────┘
+                         │
+                         ▼
+              ┌──────────────────────┐
+              │ Google Earth Engine  │
+              │ Elevation / Land     │
+              │ Cover / Water        │
+              └──────────┬───────────┘
+                         │
+                         ▼
+              ┌──────────────────────┐
+              │ Infrastructure Data  │
+              │ OSM / GIS            │
+              │ Hospitals / Roads     │
+              │ Schools / Power       │
+              │ Shelters              │
+              └──────────┬───────────┘
+                         │
+                         ▼
+              ┌──────────────────────┐
+              │ Hazard Screening     │
+              │ Surge / Rainfall     │
+              │ Pathways / Terrain   │
+              └──────────┬───────────┘
+                         │
+                         ▼
+              ┌──────────────────────┐
+              │ Risk & Impact Engine │
+              │ Exposure / Impact    │
+              │ Vulnerability        │
+              └──────────┬───────────┘
+                         │
+                         ▼
+        ┌─────────────────────────────────┐
+        │      Anticipatory Actions       │
+        ├─────────────────────────────────┤
+        │ Evacuation Planning              │
+        │ Infrastructure Hardening         │
+        │ Early-Warning Advisory           │
+        │ Financial Resilience             │
+        └────────────────┬────────────────┘
+                         │
+                         ▼
+              ┌──────────────────────┐
+              │ Gemini AI Reasoning  │
+              │ Contextual Analysis  │
+              └──────────────────────┘
